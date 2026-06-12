@@ -37,8 +37,9 @@ The `watsonx` and `genesys` proof surfaces cite this spec for their capability a
 ## Validating a declaration
 
 ```bash
-# any JSON Schema 2020-12 validator works; example with ajv
-npx ajv-cli validate -s schema.json -d example.json --spec=draft2020
+# any JSON Schema 2020-12 validator works; example with ajv.
+# ajv-formats supplies the standard "uri"/"date-time" formats this schema uses.
+npx -p ajv-cli -p ajv-formats ajv validate -s schema.json -d example.json --spec=draft2020 -c ajv-formats
 ```
 
 ## Versioning

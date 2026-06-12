@@ -93,7 +93,7 @@
     {
       "$comment": "Anti-vapor rule: a control declared live MUST carry an attestation a verifier can fetch.",
       "if": { "properties": { "status": { "const": "live" } } },
-      "then": { "properties": { "evidence": { "required": ["attestation"] } }, "required": ["evidence"] }
+      "then": { "type": "object", "required": ["evidence"], "properties": { "evidence": { "type": "object", "required": ["attestation"] } } }
     }
   ]
 }
