@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://specs.kineticgain.com/core-governance/v0.1/schema.json",
+  "title": "Kinetic Gain — Core Governance Declaration",
+  "description": "A machine-readable declaration of what an AI model or agent can do, how it is classified under recognized risk frameworks, what data it touches, and where its evidence lives. This is the governance and evidence declaration layer — composable with MCP (connection/transport) and CycloneDX ML-BOM (component provenance), not a competitor to either.",
+  "type": "object",
+  "required": ["kg_version", "subject", "capabilities", "regulatory_class", "data_posture", "evidence", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "kg_version": { "type": "string", "const": "0.1" },
+    "subject": {
+      "type": "object",
+      "description": "The AI system being governed.",
+      "required": ["id", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "format": "uri", "description": "Stable URN/URI for the governed system." },
+        "type": { "type": "string", "enum": ["model", "agent", "pipeline", "tool"] },
+        "name": { "type": "string" },
+        "platform": { "type": "string", "description": "Host platform, e.g. 'IBM watsonx', 'Genesys Cloud'." },
+        "version": { "type": "string" },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "builder": { "type": "string" },
+            "model_lineage": { "type": "string" },
+            "cyclonedx_ref": { "type": "string", "format": "uri", "description": "Optional link to a CycloneDX ML-BOM for component provenance." }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "What the system is declared to be able to do. At least one.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "autonomy_level"],
+        "additionalProperties": false,
+        "properties": {
+          "action": { "type": "string", "description": "A declared capability, e.g. 'summarize_document', 'route_interaction'." },
+          "description": { "type": "string" },
+          "data_scopes": { "type": "array", "items": { "type": "string" } },
+          "autonomy_level": { "type": "string", "enum": ["assistive", "supervised", "autonomous"] }
+        }
+      }
+    },
+    "regulatory_class": {
+      "type": "object",
+      "description": "A self-asserted risk classification. An assertion backed by evidence — NOT a certification.",
+      "required": ["framework", "class", "asserted_by", "asserted_at"],
+      "additionalProperties": false,
+      "properties": {
+        "framework": { "type": "string", "enum": ["eu_ai_act", "nist_ai_rmf", "kg_default"] },
+        "class": { "type": "string", "description": "e.g. for eu_ai_act: 'high' | 'limited' | 'minimal'." },
+        "rationale": { "type": "string" },
+        "asserted_by": { "type": "string" },
+        "asserted_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "data_posture": {
+      "type": "object",
+      "required": ["access"],
+      "additionalProperties": false,
+      "properties": {
+        "access": { "type": "string", "enum": ["read_only", "scoped_write"] },
+        "classifications": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["public", "internal", "pii", "phi", "pci", "confidential"] }
+        },
+        "residency": { "type": "string" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Where the verifiable evidence for this declaration lives.",
+      "required": ["method"],
+      "additionalProperties": false,
+      "properties": {
+        "audit_stream": { "type": "string", "format": "uri", "description": "Append-only, hash-chained event stream." },
+        "attestation": { "type": "string", "format": "uri", "description": "An endpoint a verifier can fetch to check this declaration." },
+        "method": { "type": "string", "enum": ["sha256_hash_chain"] }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["live", "mapped", "pending"],
+      "description": "Honest deployment status. 'live' requires a reachable attestation (see allOf)."
+    }
+  },
+  "allOf": [
+    {
+      "$comment": "Anti-vapor rule: a control declared live MUST carry an attestation a verifier can fetch.",
+      "if": { "properties": { "status": { "const": "live" } } },
+      "then": { "properties": { "evidence": { "required": ["attestation"] } }, "required": ["evidence"] }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "kg_version": "0.1",
+  "subject": {
+    "id": "urn:kg:watsonx:transcript-summarizer:1",
+    "type": "agent",
+    "name": "watsonx Transcript Summarizer",
+    "platform": "IBM watsonx",
+    "version": "1.0.0",
+    "provenance": {
+      "builder": "Kinetic Gain",
+      "model_lineage": "watsonx.ai foundation model, fine-tuned for governed summarization"
+    }
+  },
+  "capabilities": [
+    {
+      "action": "summarize_document",
+      "description": "Produces a summary of a governed document for human review.",
+      "data_scopes": ["internal"],
+      "autonomy_level": "assistive"
+    }
+  ],
+  "regulatory_class": {
+    "framework": "eu_ai_act",
+    "class": "limited",
+    "rationale": "Assistive summarization with mandatory human review; no automated decision affecting individual rights.",
+    "asserted_by": "Kinetic Gain",
+    "asserted_at": "2026-06-11T00:00:00Z"
+  },
+  "data_posture": {
+    "access": "read_only",
+    "classifications": ["internal"],
+    "residency": "us-east"
+  },
+  "evidence": {
+    "audit_stream": "https://github.com/mizcausevic-dev/audit-stream-py#audit-stream",
+    "method": "sha256_hash_chain"
+  },
+  "status": "mapped"
+}
